@@ -110,7 +110,7 @@ class Decoder(nn.Module):
         grid = torch.cat((xx,yy),1).float()
 
         if x.is_cuda:
-            grid = grid.cuda()
+            grid = grid.to(device=x.device)
         vgrid = torch.autograd.Variable(grid) + flo
 
         # scale grid to [-1,1] 
@@ -119,7 +119,7 @@ class Decoder(nn.Module):
 
         vgrid = vgrid.permute(0,2,3,1)        
         output = nn.functional.grid_sample(x, vgrid, align_corners=False)
-        mask = torch.autograd.Variable(torch.ones(x.size())).cuda()
+        mask = torch.autograd.Variable(torch.ones(x.size())).to(device=x.device)
         mask = nn.functional.grid_sample(mask, vgrid, align_corners=False)
 
         # if W==128:
@@ -153,7 +153,7 @@ class Refiner(nn.Module):
     def __init__(self):
         super().__init__()
         self.refiner = nn.Sequential(
-            nn.Conv2d(in_channels=549, out_channels=128, kernel_size=3, stride=1, padding=1, dilation=1),
+            nn.Conv2d(in_channels=565, out_channels=128, kernel_size=3, stride=1, padding=1, dilation=1),
             nn.LeakyReLU(inplace=False, negative_slope=0.1),
             nn.Conv2d(in_channels=128, out_channels=128, kernel_size=3, stride=1, padding=2, dilation=2),
             nn.LeakyReLU(inplace=False, negative_slope=0.1),
